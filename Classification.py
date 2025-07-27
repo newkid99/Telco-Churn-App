@@ -30,7 +30,7 @@ st.image(logo,caption="",width=300)
 
 #Looading data at the Global level
 try:
-    dataset = pd.read_csv("C:/Users/kojon/PycharmProjects/SupervisedProjects/Supervised Projects/Customer-Churn.csv")
+    dataset = pd.read_csv(""data/Customer-Churn.csv")
 except FileNotFoundError as e :
     st.error(f"User, check if there is error loading dataset{e}")
     st.stop()
