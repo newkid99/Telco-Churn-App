@@ -1,9 +1,7 @@
 import numpy as np ## Handling arrays
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
-from fontTools.ttx import process
-from pandas.io.xml import preprocess_data
+import seaborn as sn
 from select import select
 
 from sklearn.preprocessing import LabelEncoder
