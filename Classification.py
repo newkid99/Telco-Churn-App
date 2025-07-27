@@ -25,7 +25,7 @@ from PIL import Image
 from streamlit import dataframe
 from unicodedata import numeric
 
-logo = Image.open("C:/Users/kojon/PycharmProjects/SupervisedProjects/Supervised Projects/FOXTECH LOGO.jpeg")
+logo = Image.open("data/assets/FOXTECH LOGO.jpeg")
 st.image(logo,caption="",width=300)
 
 #Looading data at the Global level
