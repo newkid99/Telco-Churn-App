@@ -361,7 +361,6 @@ def page3():
     st.session_state[f"{prefix}_cv_scores"] = cv_scores
     st.metric("Test Accuracy", f"{acc:.2%}")
 
-    st.metric("Test Accuracy", f"{acc:.2%}")
     with st.expander("10-Fold Cross-Validation (Top 10 Features)"):
         st.write(f"CV Mean Accuracy: **{cv_scores.mean():.2%}**")
         st.write("All Fold Scores:", cv_scores)
