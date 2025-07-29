@@ -359,6 +359,8 @@ def page3():
     st.session_state[f"{prefix}_precision"] = precision
     st.session_state[f"{prefix}_recall"] = recall
     st.session_state[f"{prefix}_cv_scores"] = cv_scores
+
+    
     st.metric("Test Accuracy", f"{acc:.2%}")
 
     with st.expander("10-Fold Cross-Validation (Top 10 Features)"):
