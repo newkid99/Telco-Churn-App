@@ -346,12 +346,33 @@ def page3():
 
     # --- Metrics ---
     acc = accuracy_score(y_test, y_pred)
+    acc = accuracy_score(y_test, y_pred)
+    cv_scores = cross_val_score(model, full_X[top_10_features], full_y, cv=10)
+    precision = precision_score(y_test, y_pred)
+    recall = recall_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred)
+
+    ##Save metrics to session state
+    prefix = selected_model.replace(" ","_")
+    st.session_state[f"{prefix}_accuracy"] = acc
+    st.session_state[f"{prefix}_f1"] = f1
+    st.session_state[f"{prefix}_precision"] = precision
+    st.session_state[f"{prefix}_recall"] = recall
+    st.session_state[f"{prefix}_cv_scores"] = cv_scores
     st.metric("Test Accuracy", f"{acc:.2%}")
 
     with st.expander("10-Fold Cross-Validation (Top 10 Features)"):
         cv_scores = cross_val_score(model, full_X[top_10_features], full_y, cv=10)
         st.write(f"CV Mean Accuracy: **{cv_scores.mean():.2%}**")
         st.write("All Fold Scores:", cv_scores)
+
+    st.subheader("📋 Detailed Metrics Table")
+    metrics_df = pd.DataFrame({
+        "Metric": ["F1 Score", "Precision", "Recall"],
+        "Score": [f1, precision, recall]
+    })
+    metrics_df["Score"] = metrics_df["Score"].apply(lambda x: f"{x:.2%}")
+    st.dataframe(metrics_df)
 
     # --- Confusion Matrix ---
     cm = confusion_matrix(y_test, y_pred)
@@ -497,6 +518,76 @@ def page4():
         st.pyplot(fig)
 
 
+        # --- SHAP Explanation ---
+        st.subheader("🔍 Why this prediction? (SHAP Explanation)")
+
+        # Explain prediction
+        explainer = shap.Explainer(model, x)
+        shap_values = explainer(input_encoded)
+        shap_row = shap_values[0]
+
+        # Create dict of feature name → float SHAP value
+        impact_dict = {
+            feature: float(np.ravel(value)[0])  # ensure scalar float
+            for feature, value in zip(input_encoded.columns, shap_row.values)
+        }
+
+        # Sort by absolute impact
+        sorted_impact = sorted(impact_dict.items(), key=lambda kv: abs(kv[1]), reverse=True)
+
+        # Display top 5 contributors
+        for feature, impact in sorted_impact[:5]:
+            direction = "increases" if impact > 0 else "decreases"
+            st.markdown(
+                f"- **{feature}** → {direction} churn risk by **{abs(impact * 100):.1f}%**"
+            )
+
+        # --- SHAP Bar Plot (Manual Matplotlib Version) ---
+        st.subheader("🔢 SHAP Feature Impact")
+
+        # Get top 10 sorted features
+        top_features = list(dict(sorted(impact_dict.items(), key=lambda kv: abs(kv[1]), reverse=True)).items())[:10]
+
+        # Create bar plot using matplotlib
+        features = [f for f, _ in top_features]
+        impacts = [i for _, i in top_features]
+        colors = ['green' if i < 0 else 'red' for i in impacts]
+
+        fig, ax = plt.subplots()
+        ax.barh(features[::-1], impacts[::-1], color=colors[::-1])
+        ax.set_xlabel("SHAP Value (Impact on Churn Prediction)")
+        ax.set_title("Top 10 SHAP Feature Contributions")
+        st.pyplot(fig)
+
+        # --- Emoji Mapping for Key Features ---
+        emoji_map = {
+            'Contract': '📅',
+            'TechSupport': '🛠️',
+            'OnlineServices': '🌐',
+            'DeviceProtection': '🔐',
+            'PaymentMethod': '💳',
+            'InternetService': '📡',
+            'PaperlessBilling': '📄',
+            'MonthlyCharges': '💰',
+            'Family': '👨‍👩‍👧‍👦',
+            'PhoneService': '📞',
+            'SeniorCitizen': '👴',
+            'Gender': '⚧️',
+            'StreamingServices': '📺'
+        }
+
+        # --- High-Risk Feature Warning ---
+        if pred == 1 and prob > 0.5:
+            high_risk_features = [(f, v) for f, v in sorted_impact[:5] if v > 0]
+            if high_risk_features:
+                risky_labels = [
+                    f"{emoji_map.get(f, '⚠️')} **{f}**" for f, _ in high_risk_features
+                ]
+                st.error(
+                    f"🚨 **Risk Factors Increasing Churn:** {' | '.join(risky_labels)}"
+                )
+
+
 def page5():
     st.header("📊 Interpretation and Conclusions")
 
@@ -545,13 +636,27 @@ def page5():
     st.markdown("**Random Forest**")
     plot_feature_importance("Random Forest")
 
+
     # --- Performance Summary Table ---
     st.subheader("📋 Model Performance Comparison")
+    # Retrieve metrics or fallback to N/A
+    def get_metric(model, metric):
+        key = model.replace(" ", "_") + f"_{metric}"
+        if key in st.session_state:
+          value = st.session_state[key]
+          if isinstance(value,(np.ndarray,list)):
+              return f"{np.mean(value):.2%}"
+          else:
+              return f"{value:.2%}"
+        return "N/A"
 
-    # Create summary manually based on your own experiments
     summary_data = {
         "Model": ["Decision Tree", "Random Forest"],
-        "Accuracy (CV)": ["~75%", "~80%"],
+        "Accuracy (CV)": [get_metric("Decision Tree", "cv_scores"), get_metric("Random Forest", "cv_scores")],
+        "Test Accuracy": [get_metric("Decision Tree", "accuracy"), get_metric("Random Forest", "accuracy")],
+        "F1 Score": [get_metric("Decision Tree", "f1"), get_metric("Random Forest", "f1")],
+        "Precision": [get_metric("Decision Tree", "precision"), get_metric("Random Forest", "precision")],
+        "Recall": [get_metric("Decision Tree", "recall"), get_metric("Random Forest", "recall")],
         "Strengths": [
             "Interpretable, easy to visualize",
             "Better accuracy, handles complexity well"
@@ -561,7 +666,7 @@ def page5():
             "Harder to interpret, slower to train"
         ]
     }
-
+    
     summary_df = pd.DataFrame(summary_data)
     st.dataframe(summary_df)
 
