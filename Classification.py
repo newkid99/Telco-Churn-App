@@ -347,7 +347,6 @@ def page3():
 
     # --- Metrics ---
     acc = accuracy_score(y_test, y_pred)
-    acc = accuracy_score(y_test, y_pred)
     cv_scores = cross_val_score(model, full_X[top_10_features], full_y, cv=10)
     precision = precision_score(y_test, y_pred)
     recall = recall_score(y_test, y_pred)
@@ -362,8 +361,8 @@ def page3():
     st.session_state[f"{prefix}_cv_scores"] = cv_scores
     st.metric("Test Accuracy", f"{acc:.2%}")
 
+    st.metric("Test Accuracy", f"{acc:.2%}")
     with st.expander("10-Fold Cross-Validation (Top 10 Features)"):
-        cv_scores = cross_val_score(model, full_X[top_10_features], full_y, cv=10)
         st.write(f"CV Mean Accuracy: **{cv_scores.mean():.2%}**")
         st.write("All Fold Scores:", cv_scores)
 
