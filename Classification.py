@@ -19,6 +19,10 @@ from PIL import Image
 from streamlit import dataframe
 from unicodedata import numeric
 import shap ## To help explain each feature importance to the churn analysis
+from fpdf import FPDF
+import io
+import tempfile
+import os
 
 logo = Image.open("data/assets/FOXTECH LOGO.jpeg") ### Loading of Company Logo
 st.image(logo,caption="",width=300)
@@ -600,6 +604,66 @@ def page4():
                 st.error(
                     f"🚨 **Risk Factors Increasing Churn:** {' | '.join(risky_labels)}"
                 )
+   
+        class PDF(FPDF):
+            def header(self):
+                # Add FOXTECH logo
+                self.image("data/assets/FOXTECH LOGO.jpeg", x=10, y=8, w=30)
+                self.set_font("Arial", "B", 16)
+                self.cell(0, 10, "Customer Churn Prediction Report", ln=True, align="C")
+                self.ln(12)
+
+            def add_prediction_section(self, prob):
+                self.set_font("Arial", "", 12)
+                self.multi_cell(0, 8, f"Churn Probability: {prob:.2%}")
+                self.ln(5)
+
+            def add_shap_explanation(self, sorted_impact):
+                self.set_font("Arial", "B", 12)
+                self.cell(0, 8, "SHAP Explanation (Top 5 Features):", ln=True)
+                self.set_font("Arial", "", 11)
+                for feature, impact in sorted_impact[:5]:
+                    direction = "increases" if impact > 0 else "decreases"
+                    self.multi_cell(
+                        0, 6,
+                        f"- {feature} {direction} churn risk by {abs(impact * 100):.1f}%"
+                    )
+                self.ln(5)
+
+            def add_shap_plot(self, fig):
+                # Save fig to a temp image file
+                with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:
+                    fig.savefig(tmpfile.name, format="png", bbox_inches='tight')
+                    tmpfile_path = tmpfile.name
+
+                epw = self.w - self.l_margin - self.r_margin
+                self.image(tmpfile.name, x=10, w=epw - 20)
+
+
+                os.remove(tmpfile_path)
+                self.ln(5)
+
+        # --- 2. Create the PDF Report ---
+        pdf = PDF()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.add_page()
+        pdf.add_prediction_section(prob)
+        pdf.add_shap_explanation(sorted_impact)
+        pdf.add_shap_plot(fig)
+
+        # --- 3. Save to memory for Streamlit download ---
+        pdf_bytes = io.BytesIO()
+        pdf_output_str = pdf.output(dest='S').encode('latin-1')
+        pdf_bytes.write(pdf_output_str)
+        pdf_bytes.seek(0)
+
+        # --- 4. Show download button ---
+        st.download_button(
+            label="📥 Download PDF Report",
+            data=pdf_bytes,
+            file_name="churn_prediction_report.pdf",
+            mime="application/pdf"
+        )
 
 ##Page 5
 def page5():
