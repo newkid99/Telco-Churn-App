@@ -6,3 +6,7 @@ matplotlib
 seaborn
 Pillow
 shap
+fpdf
+io
+tempfile
+os
