@@ -47,10 +47,10 @@ dataset_1 = dataset.copy()
 def preprocess_churn_dataset(df):
     df = df.copy() ## Creating a copy of the dataa
 
-    # Handle missing TotalCharges values
+    # Handle missing TotalCharges values by dropping them
     df['TotalCharges'] = df['TotalCharges'].replace(" ", np.nan)
-    df['TotalCharges'] = df['TotalCharges'].fillna(0)
-    df['TotalCharges'] = pd.to_numeric(df['TotalCharges'])
+    df['TotalCharges'] = pd.to_numeric(df['TotalCharges'],errors ='coerce')
+    df = df.dropna(subset=['TotalCharges'])
 
     # Create 'Family' feature
     df['Family'] = np.where((df['Partner'] == 'No') & (df['Dependents'] == 'No'), 'No', 'Yes')
@@ -222,7 +222,7 @@ def page2():
     st.subheader("Summary Statistics")
     ##Summary statistics of Numeric Columns
     if st.checkbox("Summary Statistics of Numeric Columns"):
-        st.write(processed_dataset.describe())
+        st.write(processed_dataset[numeric_cols].describe())
 
     ##Summary statistics of Categorical Columns
     if st.checkbox("Summary Statistics of Categorical Columns"):
