@@ -1,3 +1,9 @@
+#--Group Members
+#-1 Amanor Teinor – 22258276---
+#-2.Joseph Harvey-Ewusi – 22253143---
+#-3.Kwadwo Jectey Nyarko – 11410422---
+#-4.Anael K. Djentuh - 22252467---
+#-5.Princess Awurabena Frimpong- 22254024--
 import numpy as np ## 
 import pandas as pd
 import matplotlib.pyplot as plt
