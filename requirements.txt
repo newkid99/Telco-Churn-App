@@ -6,7 +6,4 @@ matplotlib
 seaborn
 Pillow
 shap
-io
-tempfile
-os
 fpdf==1.7.2
