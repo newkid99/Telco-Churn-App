@@ -9,4 +9,4 @@ shap
 io
 tempfile
 os
-FPDF
+fpdf==1.7.2
