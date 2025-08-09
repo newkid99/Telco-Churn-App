@@ -854,9 +854,7 @@ def page5():
     plot_feature_importance("Decision Tree")
     st.markdown("**Random Forest**")
     plot_feature_importance("Random Forest")
-    st.markdown("**AdaBoost**")
-    plot_feature_importance("AdaBoost")
-
+    
     # --- Performance Summary Table ---
     st.subheader("📋 Model Performance Comparison")
     # Retrieve metrics or fallback to N/A
@@ -916,6 +914,7 @@ select_page=st.sidebar.selectbox("select page",list(pages.keys()))
 
 ##Display the page when clicked
 pages[select_page]()
+
 
 
 
