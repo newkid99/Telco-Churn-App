@@ -247,7 +247,7 @@ def page2():
     st.subheader("Summary Statistics")
     ##Summary statistics of Numeric Columns
     if st.checkbox("Summary Statistics of Numeric Columns"):
-        st.write(dataset[numeric_cols].describe())
+        st.write(processed_dataset[numeric_cols].describe())
 
     ##Summary statistics of Categorical Columns
     if st.checkbox("Summary Statistics of Categorical Columns"):
@@ -916,6 +916,7 @@ select_page=st.sidebar.selectbox("select page",list(pages.keys()))
 
 ##Display the page when clicked
 pages[select_page]()
+
 
 
 
