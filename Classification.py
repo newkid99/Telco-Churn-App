@@ -854,6 +854,8 @@ def page5():
     plot_feature_importance("Decision Tree")
     st.markdown("**Random Forest**")
     plot_feature_importance("Random Forest")
+
+    st.write("Session keys:", list(st.session_state.keys()))
     
     # --- Performance Summary Table ---
     st.subheader("📋 Model Performance Comparison")
@@ -914,6 +916,7 @@ select_page=st.sidebar.selectbox("select page",list(pages.keys()))
 
 ##Display the page when clicked
 pages[select_page]()
+
 
 
 
