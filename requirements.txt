@@ -7,3 +7,5 @@ seaborn
 Pillow
 shap
 fpdf==1.7.2
+imbalanced-learn
+
