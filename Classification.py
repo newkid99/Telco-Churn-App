@@ -41,7 +41,7 @@ import tempfile
 import os
 
 #--- Loading of Company Logo----
-logo = Image.open("d/assets/FOXTECH LOGO.jpeg")
+logo = Image.open("data/assets/FOXTECH LOGO.jpeg")
 st.image(logo,caption="",width=300)
 
 #Looading data at the Global level
@@ -916,6 +916,7 @@ select_page=st.sidebar.selectbox("select page",list(pages.keys()))
 
 ##Display the page when clicked
 pages[select_page]()
+
 
 
 
