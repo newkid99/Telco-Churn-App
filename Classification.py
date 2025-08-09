@@ -750,7 +750,7 @@ def page4():
         class PDF(FPDF):
             def header(self):
                 # Add FOXTECH logo
-                self.image("C:/Users/kojon/PycharmProjects/SupervisedProjects/Supervised Projects/FOXTECH LOGO.jpeg", x=10, y=8, w=30)
+                self.image("data/assets/FOXTECH LOGO.jpeg", x=10, y=8, w=30)
                 self.set_font("Arial", "B", 16)
                 self.cell(0, 10, "Customer Churn Prediction Report", ln=True, align="C")
                 self.ln(12)
@@ -916,6 +916,7 @@ select_page=st.sidebar.selectbox("select page",list(pages.keys()))
 
 ##Display the page when clicked
 pages[select_page]()
+
 
 
 
